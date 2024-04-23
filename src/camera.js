@@ -40,7 +40,7 @@ class Camera {
         }
 
         // Helper vectors
-        this.pos = vec3.create()
+        this.lookat = vec3.create()
         this.front = vec3.create()
         this.right = vec3.create()        
 
@@ -174,10 +174,10 @@ class Camera {
     }
 
     update() {
-        vec3.add(this.pos, this.position, this.getPos())
+        vec3.add(this.lookat, this.position, this.getPos())
 
         // Create a lookAt view matrix
-        mat4.lookAt(this.viewMatrix, this.pos, this.position, this.up)
+        mat4.lookAt(this.viewMatrix, this.lookat, this.position, this.up)
 
         // Create a perspective projection matrix
         const aspect = gl.canvas.width / gl.canvas.height
@@ -229,7 +229,7 @@ class Camera {
         const Px = (x / window.innerWidth * 2 - 1)
         const Py = -(y / window.innerHeight * 2 - 1)
         const cameraToWorld = mat4.invert(mat4.create(), this.vpm)
-        const rayOriginWorld = vec3.transformMat4(vec3.create(), this.pos, cameraToWorld)
+        const rayOriginWorld = vec3.transformMat4(vec3.create(), this.lookat, cameraToWorld)
         const rayPWorld = vec3.transformMat4(vec3.create(), [Px, Py, 1], cameraToWorld)
         const rd = vec3.subtract(vec3.create(), rayPWorld, rayOriginWorld)
         vec3.normalize(rd, rd)
@@ -242,7 +242,7 @@ class Camera {
 
             if (alpha < 0.1) continue
 
-            const t = raySphereIntersection(this.pos, rd, pos, 0.1)
+            const t = raySphereIntersection(this.lookat, rd, pos, 0.1)
 
             if (t > 0.4 && t < hit.dist) {
                 hit.id = i
@@ -252,7 +252,7 @@ class Camera {
 
         if (hit.id == -1) return null
 
-        const hitPosition = vec3.add(vec3.create(), this.pos, vec3.scale(vec3.create(), rd, hit.dist))
+        const hitPosition = vec3.add(vec3.create(), this.lookat, vec3.scale(vec3.create(), rd, hit.dist))
         this.calibrationPoints.push(hitPosition)
 
         // Update gizmo renderer
