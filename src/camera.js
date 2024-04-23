@@ -174,8 +174,7 @@ class Camera {
     }
 
     update() {
-        // Update current position
-        vec3.add(this.pos, this.position, this.getPos(this.freeFly ? 1 : this.radius))
+        vec3.add(this.pos, this.position, this.getPos())
 
         // Create a lookAt view matrix
         mat4.lookAt(this.viewMatrix, this.pos, this.position, this.up)
