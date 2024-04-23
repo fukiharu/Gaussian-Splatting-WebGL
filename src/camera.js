@@ -157,25 +157,17 @@ class Camera {
         requestRender()
     }
 
-    getPos(radius = this.radius) {
-        const pos = [
-            radius * Math.sin(this.phi) * Math.cos(this.theta),
-            radius * Math.cos(this.phi),
-            radius * Math.sin(this.phi) * Math.sin(this.theta)
+    getFront(radius = this.radius) {
+        return [
+            Math.sin(this.phi) * Math.cos(this.theta),
+            Math.cos(this.phi),
+            Math.sin(this.phi) * Math.sin(this.theta)
         ]
-
-        return vec3.transformMat3(pos, pos, this.sceneRotationMatrix)
-    }
-
-    getFront() {
-        const front = vec3.subtract(this.front, [0,0,0], this.getPos())
-        vec3.normalize(front, front)
-        return front
     }
 
     update() {
-        vec3.add(this.lookat, this.position, this.getPos())
-
+        vec3.add(this.lookat, this.position, vec3.scale(vec3.create(), this.getFront(), this.radius))
+                
         // Create a lookAt view matrix
         mat4.lookAt(this.viewMatrix, this.position, this.lookat, this.up)
 
