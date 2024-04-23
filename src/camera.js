@@ -1,7 +1,7 @@
 const { mat4, vec3, vec4 } = glMatrix
 
 class Camera {
-    constructor({position = [0, 0, 0], up = [0, 1, 0], camera = [], defaultCameraMode} = {}) {
+    constructor({position = [0, 0, 0], up = [0, 0, 1], camera = [], defaultCameraMode} = {}) {
         this.position = [...position] // Position of Camera
         this.up = [...up]         // Up vector
 
@@ -49,7 +49,7 @@ class Camera {
         this.projMatrix = mat4.create()
         this.viewProjMatrix = mat4.create()
         this.lastViewProjMatrix = mat4.create()
-        this.sceneRotationMatrix = rotateAlign(this.up, [0, 1, 0])
+        this.sceneRotationMatrix = rotateAlign(this.up, [0, 0, 1])
 
         // Matrices sent to the GPU
         this.vm = mat4.create()
@@ -129,7 +129,7 @@ class Camera {
     }
 
     // Reset parameters on new scene load
-    setParameters({position = [0, 0, 0], up = [0, 1, 0], camera = [], defaultCameraMode} = {}) {
+    setParameters({position = [0, 0, 0], up = [0, 0, 1], camera = [], defaultCameraMode} = {}) {
         this.position = [...position]
         this.up = [...up]
         this.theta  = camera[0] ?? -Math.PI/2
@@ -137,7 +137,7 @@ class Camera {
         this.radius = camera[2] ?? 3
         this.freeFly = settings.freeFly = defaultCameraMode !== 'orbit'
         this.needsWorkerUpdate = true
-        this.sceneRotationMatrix = rotateAlign(this.up, [0, 1, 0])
+        this.sceneRotationMatrix = rotateAlign(this.up, [0, 0, 1])
         camController.resetCalibration()
     }
 
