@@ -14,7 +14,7 @@ let gizmoRenderer = new GizmoRenderer()
 let positionBuffer, positionData, opacityData
 
 const settings = {
-    scene: 'room',
+    scene: 'pizza',
     renderResolution: 0.2,
     maxGaussians: 1e6,
     scalingModifier: 1,
@@ -31,6 +31,21 @@ const settings = {
     calibrateCamera: () => {},
     finishCalibration: () => {},
     showGizmo: true
+}
+
+const config = {
+    "room": {
+        url: "https://huggingface.co/kishimisu/3d-gaussian-splatting-webgl/resolve/main/room.ply",
+    },
+    'building': {
+        url: "https://huggingface.co/kishimisu/3d-gaussian-splatting-webgl/resolve/main/building.ply",
+    },
+    'garden': {
+        url: "https://huggingface.co/kishimisu/3d-gaussian-splatting-webgl/resolve/main/garden.ply",
+    },
+    'pizza': {
+        url: "https://qfdsn0phmslzra9l.public.blob.vercel-storage.com/pizza-2LDMlieZt6hqtZMIwiWxnlxd9MacMH.ply",
+    },
 }
 
 const defaultCameraParameters = {
@@ -53,7 +68,16 @@ const defaultCameraParameters = {
         target: [0.338164, 1.198655, 0.455374],
         defaultCameraMode: 'orbit',
         size: '1.07gb [!]'
-    }
+    },
+    'pizza': {
+        up: [0.055540, 0.928368, 0.367486],
+        target: [0.338164, 1.198655, 0.455374],
+        boundaries: [
+
+        ],
+        defaultCameraMode: 'freefly',
+        size: '180kb'
+    },
 }
 
 async function main() {
@@ -123,7 +147,7 @@ async function loadScene({scene, file}) {
     // Create a StreamableReader from a URL Response object
     if (scene != null) {
         scene = scene.split('(')[0].trim()
-        const url = `https://huggingface.co/kishimisu/3d-gaussian-splatting-webgl/resolve/main/${scene}.ply`
+        const url = config[scene]["url"]
         const response = await fetch(url)
         contentLength = parseInt(response.headers.get('content-length'))
         reader = response.body.getReader()
