@@ -177,7 +177,7 @@ class Camera {
         vec3.add(this.lookat, this.position, this.getPos())
 
         // Create a lookAt view matrix
-        mat4.lookAt(this.viewMatrix, this.lookat, this.position, this.up)
+        mat4.lookAt(this.viewMatrix, this.position, this.lookat, this.up)
 
         // Create a perspective projection matrix
         const aspect = gl.canvas.width / gl.canvas.height
