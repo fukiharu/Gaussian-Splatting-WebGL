@@ -144,11 +144,10 @@ class Camera {
     updateKeys() {
         if (Object.values(this.keyStates).every(s => !s) || this.disableMovement) return
 
-        const front = this.getFront()
-        const right = vec3.cross(this.right, front, this.up)
+        const right = vec3.cross(this.right, this.front, this.up)
 
-        if (this.keyStates.KeyW) vec3.add(this.position, this.position, vec3.scale(front, front, settings.speed))
-        if (this.keyStates.KeyS) vec3.subtract(this.position, this.position, vec3.scale(front, front, settings.speed))
+        if (this.keyStates.KeyW) vec3.add(this.position, this.position, vec3.scale(this.front, this.front, settings.speed))
+        if (this.keyStates.KeyS) vec3.subtract(this.position, this.position, vec3.scale(this.front, this.front, settings.speed))
         if (this.keyStates.KeyA) vec3.add(this.position, this.position, vec3.scale(right, right, settings.speed))
         if (this.keyStates.KeyD) vec3.subtract(this.position, this.position, vec3.scale(right, right, settings.speed))
         if (this.keyStates.ShiftLeft) vec3.add(this.position, this.position, vec3.scale(vec3.create(), this.up, settings.speed))
@@ -157,8 +156,8 @@ class Camera {
         requestRender()
     }
 
-    getFront(radius = this.radius) {
-        return [
+    setFront() {
+        this.front =  [
             Math.sin(this.phi) * Math.cos(this.theta),
             Math.cos(this.phi),
             Math.sin(this.phi) * Math.sin(this.theta)
@@ -166,7 +165,9 @@ class Camera {
     }
 
     update() {
-        vec3.add(this.lookat, this.position, vec3.scale(vec3.create(), this.getFront(), this.radius))
+        this.setFront()
+
+        vec3.add(this.lookat, this.position, vec3.scale(vec3.create(), this.front, this.radius))
                 
         // Create a lookAt view matrix
         mat4.lookAt(this.viewMatrix, this.position, this.lookat, this.up)
