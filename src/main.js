@@ -14,7 +14,7 @@ let gizmoRenderer = new GizmoRenderer()
 let positionBuffer, positionData, opacityData
 
 const settings = {
-    scene: 'pizza',
+    scene: 'sagajo_outside',
     renderResolution: 0.2,
     maxGaussians: 1e6,
     scalingModifier: 1,
@@ -34,18 +34,17 @@ const settings = {
 }
 
 const config = {
-    "room": {
-        url: "https://huggingface.co/kishimisu/3d-gaussian-splatting-webgl/resolve/main/room.ply",
+    'sagajo_outside': {
+        url: "https://qfdsn0phmslzra9l.public.blob.vercel-storage.com/sagajo_outside-IhKzzlb0kYuYLNWSyl3RgIA68NeKag.ply",
+        // url: "models/sagajo_outside/point_cloud/iteration_30000/point_cloud.ply",
     },
-    'building': {
-        url: "https://huggingface.co/kishimisu/3d-gaussian-splatting-webgl/resolve/main/building.ply",
-    },
-    'garden': {
-        url: "https://huggingface.co/kishimisu/3d-gaussian-splatting-webgl/resolve/main/garden.ply",
+    'sagajo_canon': {
+        url: "https://qfdsn0phmslzra9l.public.blob.vercel-storage.com/sagajo_canon-n3oIFlyOxezwxEiwKJRilsU6Eovhek.ply",
+        // url: "models/sagajo_canon/point_cloud/iteration_30000/point_cloud.ply",
     },
     'pizza': {
         url: "https://qfdsn0phmslzra9l.public.blob.vercel-storage.com/pizza-2LDMlieZt6hqtZMIwiWxnlxd9MacMH.ply",
-        // url: "models/pizza/point_cloud/iteration_30000/pizza.ply"
+        // url: "models/pizza/point_cloud/iteration_30000/pizza.ply",
     },
 }
 
@@ -57,6 +56,18 @@ const defaultCameraParameters = {
         positionMin: [-3, -3, -3],
         defaultCameraMode: 'freefly',
         size: '180kb'
+    },
+    'sagajo_outside': {
+        position: [-2.21, 2.09, -1.36],
+        camera: [-0.03, 5.765, 0, 3],
+        defaultCameraMode: 'freefly',
+        size: '378mb'
+    },
+    'sagajo_canon': {
+        position: [-2.21, 2.09, -1.36],
+        camera: [-0.03, 5.765, 0, 3],
+        defaultCameraMode: 'freefly',
+        size: '580mb'
     },
 }
 
@@ -154,8 +165,7 @@ async function loadScene({scene, file}) {
 
     // Setup camera
     const cameraParameters = scene ? defaultCameraParameters[scene] : {}
-    if (cam == null) cam = new Camera(cameraParameters)
-    else cam.setParameters(cameraParameters)
+    cam = new Camera(cameraParameters)
     cam.update()
 
     // Update GUI
