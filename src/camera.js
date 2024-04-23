@@ -1,13 +1,22 @@
 const { mat4, vec3, vec4 } = glMatrix
 
 class Camera {
-    constructor({position = [0, 0, 0], up = [0, 0, 1], camera = [], defaultCameraMode} = {}) {
+    constructor({
+        position = [0, 0, 0],
+        camera = [],
+        positionMax = [100, 100, 100], 
+        positionMin = [-100, -100, -100], 
+        defaultCameraMode,
+    } = {}) {
         this.position = [...position] // Position of Camera
-        this.up = [...up]         // Up vector
+
+        this.positionMax = [...positionMax]
+        this.positionMin = [...positionMin]
 
         this.theta  = camera[0] ?? -Math.PI/2
         this.phi    = camera[1] ?? Math.PI/2
-        this.radius = camera[2] ?? 3
+        this.psi    = camera[2] ?? 0
+        this.radius = camera[3] ?? 3
 
         // Y Field of view
         this.fov_y = 0.820176
@@ -35,14 +44,18 @@ class Camera {
             KeyS: false,
             KeyA: false,
             KeyD: false,
+            KeyR: false,
+            KeyQ: false,
             ShiftLeft: false,
             Space: false
         }
 
         // Helper vectors
         this.lookat = vec3.create()
-        this.front = vec3.create()
-        this.right = vec3.create()        
+        this.front = vec3.fromValues(1, 0, 0);
+        this.right = vec3.fromValues(0, 1, 0);
+        this.up    = vec3.fromValues(0, 0, 1);
+
 
         // Helper matrices
         this.viewMatrix = mat4.create()
@@ -59,8 +72,10 @@ class Camera {
         gl.canvas.addEventListener('mousemove', e => {
             if (!e.buttons || this.disableMovement) return
 
-            this.theta -= e.movementX * 0.01 * .5
-            this.phi = Math.max(1e-6, Math.min(Math.PI - 1e-6, this.phi + e.movementY * 0.01 * .5))
+            this.theta += e.movementX * 0.005
+            this.phi -= e.movementY * 0.005
+            this.rotateRightVector(e.movementX * 0.005)
+            this.rotateUpVector(-e.movementY * 0.005)
             this.isDragging = true
 
             requestRender()
@@ -131,7 +146,6 @@ class Camera {
     // Reset parameters on new scene load
     setParameters({position = [0, 0, 0], up = [0, 0, 1], camera = [], defaultCameraMode} = {}) {
         this.position = [...position]
-        this.up = [...up]
         this.theta  = camera[0] ?? -Math.PI/2
         this.phi    = camera[1] ?? Math.PI/2
         this.radius = camera[2] ?? 3
@@ -144,28 +158,50 @@ class Camera {
     updateKeys() {
         if (Object.values(this.keyStates).every(s => !s) || this.disableMovement) return
 
-        const right = vec3.cross(this.right, this.front, this.up)
-
-        if (this.keyStates.KeyW) vec3.add(this.position, this.position, vec3.scale(this.front, this.front, settings.speed))
-        if (this.keyStates.KeyS) vec3.subtract(this.position, this.position, vec3.scale(this.front, this.front, settings.speed))
-        if (this.keyStates.KeyA) vec3.add(this.position, this.position, vec3.scale(right, right, settings.speed))
-        if (this.keyStates.KeyD) vec3.subtract(this.position, this.position, vec3.scale(right, right, settings.speed))
+        if (this.keyStates.KeyW) vec3.add(this.position, this.position, vec3.scale(vec3.create(), this.front, settings.speed))
+        if (this.keyStates.KeyS) vec3.subtract(this.position, this.position, vec3.scale(vec3.create(), this.front, settings.speed))
+        if (this.keyStates.KeyA) vec3.subtract(this.position, this.position, vec3.scale(vec3.create(), this.right, settings.speed))
+        if (this.keyStates.KeyD) vec3.add(this.position, this.position, vec3.scale(vec3.create(), this.right, settings.speed))
+        if (this.keyStates.KeyR) this.psi += 0.05
+        if (this.keyStates.KeyQ) this.psi -= 0.05
+        if (this.keyStates.KeyR) this.rotateFrontVector(-0.05)
+        if (this.keyStates.KeyQ) this.rotateFrontVector(+0.05)
         if (this.keyStates.ShiftLeft) vec3.add(this.position, this.position, vec3.scale(vec3.create(), this.up, settings.speed))
         if (this.keyStates.Space) vec3.subtract(this.position, this.position, vec3.scale(vec3.create(), this.up, settings.speed))
+
+        vec3.min(this.position, this.position, this.positionMax)
+        vec3.max(this.position, this.position, this.positionMin)
 
         requestRender()
     }
 
-    setFront() {
-        this.front =  [
-            Math.sin(this.phi) * Math.cos(this.theta),
-            Math.cos(this.phi),
-            Math.sin(this.phi) * Math.sin(this.theta)
-        ]
+    rotateRightVector(theta) {
+        const upAxisRotator = mat4.create();
+        mat4.rotate(upAxisRotator, upAxisRotator, theta, this.up);
+        vec3.transformMat4(this.up, this.up, upAxisRotator);
+        vec3.transformMat4(this.right, this.right, upAxisRotator);
+        vec3.transformMat4(this.front, this.front, upAxisRotator);
+    }
+
+    rotateUpVector(phi) {
+        const rightAxisRotator = mat4.create();
+        mat4.rotate(rightAxisRotator, rightAxisRotator, phi, this.right);
+        vec3.transformMat4(this.front, this.front, rightAxisRotator);
+        vec3.transformMat4(this.up, this.up, rightAxisRotator);
+        vec3.transformMat4(this.right, this.right, rightAxisRotator);
+    }
+
+    rotateFrontVector(psi) {
+        const frontAxisRotator = mat4.create();
+        mat4.rotate(frontAxisRotator, frontAxisRotator, psi, this.front);
+        vec3.transformMat4(this.front, this.front, frontAxisRotator);
+        vec3.transformMat4(this.up, this.up, frontAxisRotator);
+        vec3.transformMat4(this.right, this.right, frontAxisRotator);
     }
 
     update() {
-        this.setFront()
+        console.log(this.position)
+        // this.rotateVectors()
 
         vec3.add(this.lookat, this.position, vec3.scale(vec3.create(), this.front, this.radius))
                 

@@ -44,19 +44,17 @@ const config = {
         url: "https://huggingface.co/kishimisu/3d-gaussian-splatting-webgl/resolve/main/garden.ply",
     },
     'pizza': {
-        // url: "https://qfdsn0phmslzra9l.public.blob.vercel-storage.com/pizza-2LDMlieZt6hqtZMIwiWxnlxd9MacMH.ply",
-        url: "models/pizza/point_cloud/iteration_30000/pizza.ply"
+        url: "https://qfdsn0phmslzra9l.public.blob.vercel-storage.com/pizza-2LDMlieZt6hqtZMIwiWxnlxd9MacMH.ply",
+        // url: "models/pizza/point_cloud/iteration_30000/pizza.ply"
     },
 }
 
 const defaultCameraParameters = {
     'pizza': {
         position: [-2.21, 2.09, -1.36],
-        // front: [3.8, 1.3, 0, 5],
-        // boundaries: [
-        //     ["max", [20, 20, 20]],
-        //     ["min", [-20, -20, -20]],
-        // ],
+        camera: [-0.03, 5.765, 0, 3],
+        positionMax: [3, 3, 0.4],
+        positionMin: [-3, -3, -3],
         defaultCameraMode: 'freefly',
         size: '180kb'
     },
