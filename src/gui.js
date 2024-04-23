@@ -19,7 +19,7 @@ function initGUI() {
 
     // Main settings
     const sceneNames = Object.entries(defaultCameraParameters).map(([name, { size }]) => `${name} (${size})`)
-    settings.scene = sceneNames[0]
+    // settings.scene = sceneNames[0]
     gui.add(settings, 'scene', sceneNames).name('Scene').listen()
        .onChange((scene) => loadScene({ scene }))
 
@@ -75,9 +75,6 @@ function initGUI() {
 
     // Camera controls folder
     addControlsFolder(gui)
-    
-    // Github panel
-    addGithubLink(gui)
 }
 
 function addCameraCalibrationFolder(gui) {
