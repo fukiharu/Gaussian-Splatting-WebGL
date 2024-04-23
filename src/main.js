@@ -44,37 +44,19 @@ const config = {
         url: "https://huggingface.co/kishimisu/3d-gaussian-splatting-webgl/resolve/main/garden.ply",
     },
     'pizza': {
-        url: "https://qfdsn0phmslzra9l.public.blob.vercel-storage.com/pizza-2LDMlieZt6hqtZMIwiWxnlxd9MacMH.ply",
+        // url: "https://qfdsn0phmslzra9l.public.blob.vercel-storage.com/pizza-2LDMlieZt6hqtZMIwiWxnlxd9MacMH.ply",
+        url: "models/pizza/point_cloud/iteration_30000/pizza.ply"
     },
 }
 
 const defaultCameraParameters = {
-    'room': {
-        up: [0, 0.886994, 0.461779],
-        target: [-0.428322434425354, 1.2004123210906982, 0.8184626698493958],
-        camera: [4.950796326794864, 1.7307963267948987, 2.5],
-        defaultCameraMode: 'freefly',
-        size: '270mb'
-    },
-    'building': {
-        up: [0, 0.968912, 0.247403],
-        target: [-0.262075, 0.76138, 1.27392],
-        camera: [ -1.1807959999999995, 1.8300000000000007, 3.99],
-        defaultCameraMode: 'orbit',
-        size: '326mb'
-    },
-    'garden': {
-        up: [0.055540, 0.928368, 0.367486],
-        target: [0.338164, 1.198655, 0.455374],
-        defaultCameraMode: 'orbit',
-        size: '1.07gb [!]'
-    },
     'pizza': {
-        up: [0.055540, 0.928368, 0.367486],
-        target: [0.338164, 1.198655, 0.455374],
-        boundaries: [
-
-        ],
+        position: [-2.21, 2.09, -1.36],
+        // front: [3.8, 1.3, 0, 5],
+        // boundaries: [
+        //     ["max", [20, 20, 20]],
+        //     ["min", [-20, -20, -20]],
+        // ],
         defaultCameraMode: 'freefly',
         size: '180kb'
     },
