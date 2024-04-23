@@ -1,11 +1,10 @@
 const { mat4, vec3, vec4 } = glMatrix
 
 class Camera {
-    constructor({target = [0, 0, 0], up = [0, 1, 0], camera = [], defaultCameraMode} = {}) {
-        this.target = [...target] // Position of look-at target
+    constructor({position = [0, 0, 0], up = [0, 1, 0], camera = [], defaultCameraMode} = {}) {
+        this.position = [...position] // Position of Camera
         this.up = [...up]         // Up vector
 
-        // Camera spherical coordinates (around the target)
         this.theta  = camera[0] ?? -Math.PI/2
         this.phi    = camera[1] ?? Math.PI/2
         this.radius = camera[2] ?? 3
@@ -56,7 +55,7 @@ class Camera {
         this.vm = mat4.create()
         this.vpm = mat4.create()
 
-        // Rotate camera around target (mouse)
+        // Rotate camera 
         gl.canvas.addEventListener('mousemove', e => {
             if (!e.buttons || this.disableMovement) return
 
@@ -67,7 +66,7 @@ class Camera {
             requestRender()
         })
 
-        // Rotate camera around target (touch)
+        // Rotate camera 
         const lastTouch = {}
         gl.canvas.addEventListener('touchstart', e => {
             e.preventDefault()
@@ -130,8 +129,8 @@ class Camera {
     }
 
     // Reset parameters on new scene load
-    setParameters({target = [0, 0, 0], up = [0, 1, 0], camera = [], defaultCameraMode} = {}) {
-        this.target = [...target]
+    setParameters({position = [0, 0, 0], up = [0, 1, 0], camera = [], defaultCameraMode} = {}) {
+        this.position = [...position]
         this.up = [...up]
         this.theta  = camera[0] ?? -Math.PI/2
         this.phi    = camera[1] ?? Math.PI/2
@@ -148,12 +147,12 @@ class Camera {
         const front = this.getFront()
         const right = vec3.cross(this.right, front, this.up)
 
-        if (this.keyStates.KeyW) vec3.add(this.target, this.target, vec3.scale(front, front, settings.speed))
-        if (this.keyStates.KeyS) vec3.subtract(this.target, this.target, vec3.scale(front, front, settings.speed))
-        if (this.keyStates.KeyA) vec3.add(this.target, this.target, vec3.scale(right, right, settings.speed))
-        if (this.keyStates.KeyD) vec3.subtract(this.target, this.target, vec3.scale(right, right, settings.speed))
-        if (this.keyStates.ShiftLeft) vec3.add(this.target, this.target, vec3.scale(vec3.create(), this.up, settings.speed))
-        if (this.keyStates.Space) vec3.subtract(this.target, this.target, vec3.scale(vec3.create(), this.up, settings.speed))
+        if (this.keyStates.KeyW) vec3.add(this.position, this.position, vec3.scale(front, front, settings.speed))
+        if (this.keyStates.KeyS) vec3.subtract(this.position, this.position, vec3.scale(front, front, settings.speed))
+        if (this.keyStates.KeyA) vec3.add(this.position, this.position, vec3.scale(right, right, settings.speed))
+        if (this.keyStates.KeyD) vec3.subtract(this.position, this.position, vec3.scale(right, right, settings.speed))
+        if (this.keyStates.ShiftLeft) vec3.add(this.position, this.position, vec3.scale(vec3.create(), this.up, settings.speed))
+        if (this.keyStates.Space) vec3.subtract(this.position, this.position, vec3.scale(vec3.create(), this.up, settings.speed))
 
         requestRender()
     }
@@ -176,10 +175,10 @@ class Camera {
 
     update() {
         // Update current position
-        vec3.add(this.pos, this.target, this.getPos(this.freeFly ? 1 : this.radius))
+        vec3.add(this.pos, this.position, this.getPos(this.freeFly ? 1 : this.radius))
 
         // Create a lookAt view matrix
-        mat4.lookAt(this.viewMatrix, this.pos, this.target, this.up)
+        mat4.lookAt(this.viewMatrix, this.pos, this.position, this.up)
 
         // Create a perspective projection matrix
         const aspect = gl.canvas.width / gl.canvas.height
