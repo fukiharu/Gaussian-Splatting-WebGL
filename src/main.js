@@ -60,8 +60,8 @@ const defaultCameraParameters = {
                 min: [-3, -3, -3],
             },
         ],
-        cameraMin: [-1, -1, -100],
-        cameraMax: [1, 1, -100],
+        cameraMin: [-100, -100, -100],
+        cameraMax: [100, 100, -100],
         psi: Math.PI/2,
         defaultCameraMode: 'freefly',
         size: '180kb'
