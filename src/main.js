@@ -14,7 +14,7 @@ let gizmoRenderer = new GizmoRenderer()
 let positionBuffer, positionData, opacityData
 
 const settings = {
-    scene: 'sagajo_outside',
+    scene: 'pizza',
     renderResolution: 0.2,
     maxGaussians: 1e6,
     scalingModifier: 1,
@@ -50,22 +50,31 @@ const config = {
 
 const defaultCameraParameters = {
     'pizza': {
-        position: [-2.21, 2.09, -1.36],
-        camera: [-0.03, 5.765, 0, 3],
-        positionMax: [3, 3, 0.4],
-        positionMin: [-3, -3, -3],
+        camera: [0, 0, 0],
+        origin: [-2.035, -0.5125, -2.3918],
+        originX: [1.9, 0.565, 2.159],
+        boundaries: [
+            {
+                type: "box",
+                max: [5., 3, 5],
+                min: [-3, -3, -3],
+            },
+        ],
+        cameraMin: [-1, -1, -100],
+        cameraMax: [1, 1, -100],
+        psi: Math.PI/2,
         defaultCameraMode: 'freefly',
         size: '180kb'
     },
     'sagajo_outside': {
-        position: [-2.21, 2.09, -1.36],
-        camera: [-0.03, 5.765, 0, 3],
+        position: [-3, -0.17, -2.5],
+        camera: [-0.8, 0, -1.5],
         defaultCameraMode: 'freefly',
         size: '378mb'
     },
     'sagajo_canon': {
-        position: [-2.21, 2.09, -1.36],
-        camera: [-0.03, 5.765, 0, 3],
+        position: [1.86, -0.244, -0.884],
+        camera: [-1.8, 0, -1.7],
         defaultCameraMode: 'freefly',
         size: '580mb'
     },

@@ -2,21 +2,27 @@ const { mat4, vec3, vec4 } = glMatrix
 
 class Camera {
     constructor({
-        position = [0, 0, 0],
-        camera = [],
-        positionMax = [100, 100, 100], 
-        positionMin = [-100, -100, -100], 
+        origin = [0, 0, 0],
+        originX = [1, 0, 0],
+        psi = 0,
+        radius = 3,
+        boundaries = [],
+        cameraMax = [100, 100, 100], 
+        cameraMin = [-100, -100, -100], 
         defaultCameraMode,
     } = {}) {
-        this.position = [...position] // Position of Camera
+        this.origin = [...origin]
+        this.originX = [...originX]
+        this.position = vec3.fromValues(0, 0, 0)
+        this.boundaries = boundaries
 
-        this.positionMax = [...positionMax]
-        this.positionMin = [...positionMin]
+        this.cameraMin = [...cameraMin]
+        this.cameraMax = [...cameraMax]
 
-        this.theta  = camera[0] ?? -Math.PI/2
-        this.phi    = camera[1] ?? Math.PI/2
-        this.psi    = camera[2] ?? 0
-        this.radius = camera[3] ?? 3
+        this.theta  = 0
+        this.phi    = 0
+        this.psi    = 0
+        this.radius = radius
 
         // Y Field of view
         this.fov_y = 0.820176
@@ -50,11 +56,15 @@ class Camera {
             Space: false
         }
 
+        this.transformMatrix = mat4.create()
+
         // Helper vectors
         this.lookat = vec3.create()
-        this.front = vec3.fromValues(1, 0, 0);
-        this.right = vec3.fromValues(0, 1, 0);
-        this.up    = vec3.fromValues(0, 0, 1);
+        this.front = vec3.create()
+        this.left = vec3.create()
+        this.above = vec3.create()
+        this.up = vec3.fromValues(0, 0, 1);
+        this.createCoordinateSystem(psi)
 
 
         // Helper matrices
@@ -72,10 +82,25 @@ class Camera {
         gl.canvas.addEventListener('mousemove', e => {
             if (!e.buttons || this.disableMovement) return
 
-            this.theta += e.movementX * 0.005
-            this.phi -= e.movementY * 0.005
-            this.rotateRightVector(e.movementX * 0.005)
-            this.rotateUpVector(-e.movementY * 0.005)
+            // this.theta += e.movementX * 0.005
+            // this.phi -= e.movementY * 0.005
+            // this.rotateAboveVector(-e.movementX * 0.005)
+            // this.rotateRightVector(e.movementY * 0.005)
+
+            const rotateTheta = e.movementX * 0.005
+            const theta = this.theta + rotateTheta
+            if (this.cameraMin[0] <= theta && theta <=this.cameraMax[0]) {
+                this.theta = theta
+                this.rotateAboveVector(rotateTheta)
+            }
+
+            const rotatePhi = - e.movementY * 0.005
+            const phi = this.phi + rotatePhi
+            if (this.cameraMin[1] <= phi && phi <=this.cameraMax[1]) {
+                this.phi = phi
+                this.rotateRightVector(rotatePhi)
+            }
+
             this.isDragging = true
 
             requestRender()
@@ -143,6 +168,47 @@ class Camera {
         setInterval(this.updateKeys.bind(this), 1000/60)
     }
 
+    createCoordinateSystem(psi=0) {
+        const X = vec3.subtract(vec3.create(), this.originX, this.origin)
+        vec3.normalize(X, X)
+
+        const globalZ = vec3.fromValues(0, 0, 1)
+        let Y = vec3.cross(vec3.create(), X, globalZ)
+        if (vec3.length(Y) < 0.01) {
+            vec3.cross(Y, X, vec3.fromValues(0, 1, 0));
+        }
+        vec3.normalize(Y, Y);
+
+        const adjustmentMatrix = mat4.create()
+        mat4.rotate(adjustmentMatrix, adjustmentMatrix, psi, X)
+        Y = vec3.transformMat4(vec3.create(), Y, adjustmentMatrix)
+        vec3.normalize(Y, Y)
+
+        const Z = vec3.cross(vec3.create(), X, Y)
+        vec3.normalize(Z, Z)
+
+        this.coordinator = mat4.fromValues(
+            X[0], Y[0], Z[0], 0,
+            X[1], Y[1], Z[1], 0,
+            X[2], Y[2], Z[2], 0,
+            -vec3.dot(X, this.origin), -vec3.dot(Y, this.origin), -vec3.dot(Z, this.origin), 1
+        )
+
+        this.inv = mat4.invert(mat4.create(), this.coordinator)
+
+        this.front = [...X]
+        this.left = [...Y]
+        this.above = [...Z]
+    }
+
+    convertToLocalCoordinates(globalPoint) {
+        return vec3.transformMat4(vec3.create(), globalPoint, this.coordinator)
+    }
+
+    convertToGlobalCoordinates(localPoint) {
+        return vec3.transformMat4(vec3.create(), localPoint, this.inv)
+    }
+
     // Reset parameters on new scene load
     setParameters({position = [0, 0, 0], up = [0, 0, 1], camera = [], defaultCameraMode} = {}) {
         this.position = [...position]
@@ -158,55 +224,69 @@ class Camera {
     updateKeys() {
         if (Object.values(this.keyStates).every(s => !s) || this.disableMovement) return
 
-        if (this.keyStates.KeyW) vec3.add(this.position, this.position, vec3.scale(vec3.create(), this.front, settings.speed))
-        if (this.keyStates.KeyS) vec3.subtract(this.position, this.position, vec3.scale(vec3.create(), this.front, settings.speed))
-        if (this.keyStates.KeyA) vec3.subtract(this.position, this.position, vec3.scale(vec3.create(), this.right, settings.speed))
-        if (this.keyStates.KeyD) vec3.add(this.position, this.position, vec3.scale(vec3.create(), this.right, settings.speed))
+        const front = vec3.scale(vec3.create(), this.front, settings.speed)
+        const left = vec3.scale(vec3.create(), this.left, settings.speed)
+        const above = vec3.scale(vec3.create(), this.above, settings.speed)
+        const position = this.convertToGlobalCoordinates(this.position)
+
+        if (this.keyStates.KeyW) vec3.add(position, position, front)
+        if (this.keyStates.KeyS) vec3.subtract(position, position, front)
+        if (this.keyStates.KeyA) vec3.subtract(position, position, left)
+        if (this.keyStates.KeyD) vec3.add(position, position, left)
         if (this.keyStates.KeyR) this.psi += 0.05
         if (this.keyStates.KeyQ) this.psi -= 0.05
         if (this.keyStates.KeyR) this.rotateFrontVector(-0.05)
         if (this.keyStates.KeyQ) this.rotateFrontVector(+0.05)
-        if (this.keyStates.ShiftLeft) vec3.add(this.position, this.position, vec3.scale(vec3.create(), this.up, settings.speed))
-        if (this.keyStates.Space) vec3.subtract(this.position, this.position, vec3.scale(vec3.create(), this.up, settings.speed))
+        if (this.keyStates.ShiftLeft) vec3.add(position, position, above)
+        if (this.keyStates.Space) vec3.subtract(position, position, above)
 
-        vec3.min(this.position, this.position, this.positionMax)
-        vec3.max(this.position, this.position, this.positionMin)
+        const newPosition = [...this.convertToLocalCoordinates(position)]
+        
+        for (const boundary of this.boundaries) {
+            if (
+                boundary["min"][0] <= newPosition[0] && newPosition[0] <= boundary["max"][0] &&
+                boundary["min"][1] <= newPosition[1] && newPosition[1] <= boundary["max"][1] &&
+                boundary["min"][2] <= newPosition[2] && newPosition[2] <= boundary["max"][2]
+            ) {
+                this.position = [...newPosition]
+                break
+            }
+        }
 
         requestRender()
     }
 
-    rotateRightVector(theta) {
+    rotateRightVector(phi) {
         const upAxisRotator = mat4.create();
-        mat4.rotate(upAxisRotator, upAxisRotator, theta, this.up);
-        vec3.transformMat4(this.up, this.up, upAxisRotator);
-        vec3.transformMat4(this.right, this.right, upAxisRotator);
+        mat4.rotate(upAxisRotator, upAxisRotator, phi, this.left);
+        vec3.transformMat4(this.above, this.above, upAxisRotator);
+        vec3.transformMat4(this.left, this.left, upAxisRotator);
         vec3.transformMat4(this.front, this.front, upAxisRotator);
     }
 
-    rotateUpVector(phi) {
+    rotateAboveVector(theta) {
         const rightAxisRotator = mat4.create();
-        mat4.rotate(rightAxisRotator, rightAxisRotator, phi, this.right);
+        mat4.rotate(rightAxisRotator, rightAxisRotator, theta, this.above);
         vec3.transformMat4(this.front, this.front, rightAxisRotator);
-        vec3.transformMat4(this.up, this.up, rightAxisRotator);
-        vec3.transformMat4(this.right, this.right, rightAxisRotator);
+        vec3.transformMat4(this.above, this.above, rightAxisRotator);
+        vec3.transformMat4(this.left, this.left, rightAxisRotator);
     }
 
     rotateFrontVector(psi) {
         const frontAxisRotator = mat4.create();
         mat4.rotate(frontAxisRotator, frontAxisRotator, psi, this.front);
         vec3.transformMat4(this.front, this.front, frontAxisRotator);
-        vec3.transformMat4(this.up, this.up, frontAxisRotator);
-        vec3.transformMat4(this.right, this.right, frontAxisRotator);
+        vec3.transformMat4(this.above, this.above, frontAxisRotator);
+        vec3.transformMat4(this.left, this.left, frontAxisRotator);
     }
 
     update() {
         console.log(this.position)
-        // this.rotateVectors()
+        const position = this.convertToGlobalCoordinates(this.position)
+        vec3.add(this.lookat, position, vec3.scale(vec3.create(), this.front, this.radius))
 
-        vec3.add(this.lookat, this.position, vec3.scale(vec3.create(), this.front, this.radius))
-                
         // Create a lookAt view matrix
-        mat4.lookAt(this.viewMatrix, this.position, this.lookat, this.up)
+        mat4.lookAt(this.viewMatrix, position, this.lookat, this.above)
 
         // Create a perspective projection matrix
         const aspect = gl.canvas.width / gl.canvas.height
