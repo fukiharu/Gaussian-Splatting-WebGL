@@ -67,14 +67,35 @@ const defaultCameraParameters = {
         size: '180kb'
     },
     'sagajo_outside': {
-        position: [-3, -0.17, -2.5],
-        camera: [-0.8, 0, -1.5],
+        origin: [1.5227, -0.30686, -0.6966],
+        originX: [1.2345, -0.318449, 0.0922],
+        boundaries: [
+            {
+                type: "box",
+                max: [3, 3, 1],
+                min: [-1, -9, -2],
+            },
+        ],
+        cameraMin: [-100, -100, -100],
+        cameraMax: [100, 100, -100],
+        psi: -Math.PI * 20 / 36,
         defaultCameraMode: 'freefly',
         size: '378mb'
     },
     'sagajo_canon': {
-        position: [1.86, -0.244, -0.884],
-        camera: [-1.8, 0, -1.7],
+        camera: [0, 0, 0],
+        origin: [-2.035, -0.5125, -2.3918],
+        originX: [1.9, 0.565, 2.159],
+        boundaries: [
+            {
+                type: "box",
+                max: [5., 3, 5],
+                min: [-3, -3, -3],
+            },
+        ],
+        cameraMin: [-100, -100, -100],
+        cameraMax: [100, 100, -100],
+        psi: Math.PI/2,
         defaultCameraMode: 'freefly',
         size: '580mb'
     },
