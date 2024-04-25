@@ -50,7 +50,7 @@ class Camera {
             KeyS: false,
             KeyA: false,
             KeyD: false,
-            KeyR: false,
+            KeyE: false,
             KeyQ: false,
             ShiftLeft: false,
             Space: false
@@ -228,9 +228,9 @@ class Camera {
         if (this.keyStates.KeyS) vec3.subtract(position, position, front)
         if (this.keyStates.KeyA) vec3.subtract(position, position, left)
         if (this.keyStates.KeyD) vec3.add(position, position, left)
-        if (this.keyStates.KeyR) this.psi += 0.05
+        if (this.keyStates.KeyE) this.psi += 0.05
         if (this.keyStates.KeyQ) this.psi -= 0.05
-        if (this.keyStates.KeyR) this.rotateFrontVector(-0.05)
+        if (this.keyStates.KeyE) this.rotateFrontVector(-0.05)
         if (this.keyStates.KeyQ) this.rotateFrontVector(+0.05)
         if (this.keyStates.ShiftLeft) vec3.add(position, position, above)
         if (this.keyStates.Space) vec3.subtract(position, position, above)
