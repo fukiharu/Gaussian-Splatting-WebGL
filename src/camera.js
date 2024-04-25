@@ -235,19 +235,10 @@ class Camera {
         if (this.keyStates.ShiftLeft) vec3.add(position, position, above)
         if (this.keyStates.Space) vec3.subtract(position, position, above)
 
-        const newPosition = [...this.convertToLocalCoordinates(position)]
+        this.position = [...this.convertToLocalCoordinates(position)]
+        vec3.min(this.position, this.position, this.boundaries[0]["max"])
+        vec3.max(this.position, this.position, this.boundaries[0]["min"])
         
-        for (const boundary of this.boundaries) {
-            if (
-                boundary["min"][0] <= newPosition[0] && newPosition[0] <= boundary["max"][0] &&
-                boundary["min"][1] <= newPosition[1] && newPosition[1] <= boundary["max"][1] &&
-                boundary["min"][2] <= newPosition[2] && newPosition[2] <= boundary["max"][2]
-            ) {
-                this.position = [...newPosition]
-                break
-            }
-        }
-
         requestRender()
     }
 
