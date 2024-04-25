@@ -14,7 +14,7 @@ let gizmoRenderer = new GizmoRenderer()
 let positionBuffer, positionData, opacityData
 
 const settings = {
-    scene: 'pizza',
+    scene: 'kit_lobby',
     renderResolution: 0.2,
     maxGaussians: 1e6,
     scalingModifier: 1,
