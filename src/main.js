@@ -46,6 +46,10 @@ const config = {
         url: "https://qfdsn0phmslzra9l.public.blob.vercel-storage.com/pizza-2LDMlieZt6hqtZMIwiWxnlxd9MacMH.ply",
         // url: "models/pizza/point_cloud/iteration_30000/pizza.ply",
     },
+    'kit_lobby': {
+        url: "https://qfdsn0phmslzra9l.public.blob.vercel-storage.com/kit_lobby-VQ8g7rpSVmwWkEikNbbj91XQoat7OM.ply",
+        // url: "models/kit_lobby/point_cloud/iteration_140000/kit_lobby.ply",
+    }
 }
 
 const defaultCameraParameters = {
@@ -98,6 +102,23 @@ const defaultCameraParameters = {
         psi: Math.PI/2,
         defaultCameraMode: 'freefly',
         size: '580mb'
+    },
+    'kit_lobby': {
+        camera: [0, 0, 0],
+        origin: [-0.34, -0.48, -1.8853],
+        originX: [-1.2407, -0.295, 3.021],
+        boundaries: [
+            {
+                type: "box",
+                max: [6, 3.2, 3.5],
+                min: [0.35, -4, -3.5],
+            },
+        ],
+        cameraMin: [-100, -100, -100],
+        cameraMax: [100, 100, -100],
+        psi: - Math.PI* 16/36,
+        defaultCameraMode: 'freefly',
+        size: '417mb'
     },
 }
 
