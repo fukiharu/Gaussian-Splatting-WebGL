@@ -23,58 +23,58 @@ function initGUI() {
     gui.add(settings, 'scene', sceneNames).name('Scene').listen()
        .onChange((scene) => loadScene({ scene }))
 
-    gui.add(settings, 'renderResolution', 0.1, 1, 0.01).name('Preview Resolution')
+    // gui.add(settings, 'renderResolution', 0.1, 1, 0.01).name('Preview Resolution')
 
-    maxGaussianController = gui.add(settings, 'maxGaussians', 1, settings.maxGaussians, 1).name('Max Gaussians')
-       .onChange(() => {
-            cam.needsWorkerUpdate = true
-            cam.updateWorker()
-        })
+    // maxGaussianController = gui.add(settings, 'maxGaussians', 1, settings.maxGaussians, 1).name('Max Gaussians')
+    //    .onChange(() => {
+    //         cam.needsWorkerUpdate = true
+    //         cam.updateWorker()
+    //     })
 
-    gui.add(settings, 'scalingModifier', 0.01, 1, 0.01).name('Scaling Modifier')
-        .onChange(() => requestRender())
+    // gui.add(settings, 'scalingModifier', 0.01, 1, 0.01).name('Scaling Modifier')
+    //     .onChange(() => requestRender())
 
-    // File upload handler
-    gui.add(settings, 'uploadFile').name('Upload .ply file')
-    document.querySelector('#input').addEventListener('change', async e => {
-        if (e.target.files.length === 0) return
-        try {
-            await loadScene({ file: e.target.files[0] })
-        } catch (error) {
-            document.querySelector('#loading-text').textContent = `An error occured when trying to read the file.`
-            throw error
-        }
-    })
+    // // File upload handler
+    // gui.add(settings, 'uploadFile').name('Upload .ply file')
+    // document.querySelector('#input').addEventListener('change', async e => {
+    //     if (e.target.files.length === 0) return
+    //     try {
+    //         await loadScene({ file: e.target.files[0] })
+    //     } catch (error) {
+    //         document.querySelector('#loading-text').textContent = `An error occured when trying to read the file.`
+    //         throw error
+    //     }
+    // })
 
-    // Other settings
-    const otherFolder = gui.addFolder('Other Settings').close()
+    // // Other settings
+    // const otherFolder = gui.addFolder('Other Settings').close()
 
-    otherFolder.add(settings, 'sortingAlgorithm', SORTING_ALGORITHMS).name('Sorting Algorithm')
+    // otherFolder.add(settings, 'sortingAlgorithm', SORTING_ALGORITHMS).name('Sorting Algorithm')
 
-    otherFolder.add(settings, 'sortTime').name('Sort Time').disable().listen()
+    // otherFolder.add(settings, 'sortTime').name('Sort Time').disable().listen()
 
-    otherFolder.addColor(settings, 'bgColor').name('Background Color')
-       .onChange(value => {
-        document.body.style.backgroundColor = value
-        requestRender()
-    })
+    // otherFolder.addColor(settings, 'bgColor').name('Background Color')
+    //    .onChange(value => {
+    //     document.body.style.backgroundColor = value
+    //     requestRender()
+    // })
 
-    otherFolder.add(settings, 'speed', 0.01, 2, 0.01).name('Camera Speed')
+    // otherFolder.add(settings, 'speed', 0.01, 2, 0.01).name('Camera Speed')
 
-    otherFolder.add(settings, 'fov', 30, 110, 1).name('FOV')
-       .onChange(value => {
-        cam.fov_y = value * Math.PI / 180
-        requestRender()
-    })
+    // otherFolder.add(settings, 'fov', 30, 110, 1).name('FOV')
+    //    .onChange(value => {
+    //     cam.fov_y = value * Math.PI / 180
+    //     requestRender()
+    // })
 
-    otherFolder.add(settings, 'debugDepth').name('Show Depth Map')
-       .onChange(() => requestRender())
+    // otherFolder.add(settings, 'debugDepth').name('Show Depth Map')
+    //    .onChange(() => requestRender())
 
-    // Camera calibration folder
-    addCameraCalibrationFolder(gui)
+    // // Camera calibration folder
+    // addCameraCalibrationFolder(gui)
 
-    // Camera controls folder
-    addControlsFolder(gui)
+    // // Camera controls folder
+    // addControlsFolder(gui)
 }
 
 function addCameraCalibrationFolder(gui) {
