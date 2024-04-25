@@ -199,9 +199,9 @@ async function loadScene({scene, file}) {
     cam.update()
 
     // Update GUI
-    settings.maxGaussians = Math.min(settings.maxGaussians, gaussianCount)
-    maxGaussianController.max(gaussianCount)
-    maxGaussianController.updateDisplay()
+    // settings.maxGaussians = Math.min(settings.maxGaussians, gaussianCount)
+    // maxGaussianController.max(gaussianCount)
+    // maxGaussianController.updateDisplay()
 }
 
 function requestRender(...params) {
