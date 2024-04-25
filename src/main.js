@@ -14,7 +14,7 @@ let gizmoRenderer = new GizmoRenderer()
 let positionBuffer, positionData, opacityData
 
 const settings = {
-    scene: 'kit_lobby',
+    scene: 'sagajo_outside',
     renderResolution: 0.2,
     maxGaussians: 1e6,
     scalingModifier: 1,
@@ -97,29 +97,27 @@ const defaultCameraParameters = {
                 min: [-3, -3, -3],
             },
         ],
-        cameraMin: [-100, -100, -100],
-        cameraMax: [100, 100, -100],
         psi: Math.PI/2,
         defaultCameraMode: 'freefly',
         size: '580mb'
     },
-    'kit_lobby': {
-        camera: [0, 0, 0],
-        origin: [-0.34, -0.48, -1.8853],
-        originX: [-1.2407, -0.295, 3.021],
-        boundaries: [
-            {
-                type: "box",
-                max: [6, 3.2, 3.5],
-                min: [0.35, -4, -3.5],
-            },
-        ],
-        cameraMin: [-100, -100, -100],
-        cameraMax: [100, 100, -100],
-        psi: - Math.PI* 16/36,
-        defaultCameraMode: 'freefly',
-        size: '417mb'
-    },
+    // 'kit_lobby': {
+    //     camera: [0, 0, 0],
+    //     origin: [-0.34, -0.48, -1.8853],
+    //     originX: [-1.2407, -0.295, 3.021],
+    //     boundaries: [
+    //         {
+    //             type: "box",
+    //             max: [6, 3.2, 3.5],
+    //             min: [0.35, -4, -3.5],
+    //         },
+    //     ],
+    //     cameraMin: [-100, -100, -100],
+    //     cameraMax: [100, 100, -100],
+    //     psi: - Math.PI* 16/36,
+    //     defaultCameraMode: 'freefly',
+    //     size: '417mb'
+    // },
 }
 
 async function main() {
