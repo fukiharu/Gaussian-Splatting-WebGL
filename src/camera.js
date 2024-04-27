@@ -82,19 +82,19 @@ class Camera {
         gl.canvas.addEventListener('mousemove', e => {
             if (!e.buttons || this.disableMovement) return
 
-            // const rotateTheta = e.movementX * 0.005
-            // const theta = this.theta + rotateTheta
-            // if (this.cameraMin[0] <= theta && theta <=this.cameraMax[0]) {
-            //     this.theta = theta
-            //     this.rotateAboveVector(rotateTheta)
-            // }
+            const rotateTheta = e.movementX * 0.005
+            const theta = this.theta + rotateTheta
+            if (this.cameraMin[0] <= theta && theta <=this.cameraMax[0]) {
+                this.theta = theta
+                this.rotateAboveVector(rotateTheta)
+            }
 
-            // const rotatePhi = - e.movementY * 0.005
-            // const phi = this.phi + rotatePhi
-            // if (this.cameraMin[1] <= phi && phi <=this.cameraMax[1]) {
-            //     this.phi = phi
-            //     this.rotateRightVector(rotatePhi)
-            // }
+            const rotatePhi = - e.movementY * 0.005
+            const phi = this.phi + rotatePhi
+            if (this.cameraMin[1] <= phi && phi <=this.cameraMax[1]) {
+                this.phi = phi
+                this.rotateRightVector(rotatePhi)
+            }
 
             this.isDragging = true
 
