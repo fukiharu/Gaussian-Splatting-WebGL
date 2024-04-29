@@ -1,6 +1,6 @@
 // Load all gaussian data from a point-cloud file
 // Original C++ implementation: https://gitlab.inria.fr/sibr/sibr_core/-/blob/gaussian_code_release_union/src/projects/gaussianviewer/renderer/GaussianView.cpp#L70
-async function loadPly(content) {
+async function loadPly(content, coordinateSystem, splattingArea=null) {
     // Read header
     const start = performance.now()
     const contentStart = new TextDecoder('utf-8').decode(content.slice(0, 2000))
@@ -61,55 +61,66 @@ async function loadPly(content) {
     for (let i = 0; i < gaussianCount; i++) {
         // Extract data for current gaussian
         let { position, harmonic, opacity, scale, rotation } = extractSplatData(i)
-        
-        // Update scene bounding box
-        sceneMin = sceneMin.map((v, j) => Math.min(v, position[j]))
-        sceneMax = sceneMax.map((v, j) => Math.max(v, position[j]))
 
-        // Normalize quaternion
-        let length2 = 0
+        const localPoint = coordinateSystem.convertToLocalCoordinates(position)
 
-        for (let j = 0; j < 4; j++)
-            length2 += rotation[j] * rotation[j]
+        if (
+            splattingArea === null ||
+            (
+                splattingArea["min"][0] <= localPoint[0] && localPoint[0] <= splattingArea["max"][0] &&
+                splattingArea["min"][1] <= localPoint[1] && localPoint[1] <= splattingArea["max"][1] &&
+                splattingArea["min"][2] <= localPoint[2] && localPoint[2] <= splattingArea["max"][2]
+            )
+        ) {
+            // Update scene bounding box
+            sceneMin = sceneMin.map((v, j) => Math.min(v, position[j]))
+            sceneMax = sceneMax.map((v, j) => Math.max(v, position[j]))
 
-        const length = Math.sqrt(length2)
+            // Normalize quaternion
+            let length2 = 0
 
-        rotation = rotation.map(v => v / length)  
+            for (let j = 0; j < 4; j++)
+                length2 += rotation[j] * rotation[j]
 
-        // Exponentiate scale
-        scale = scale.map(v => Math.exp(v))
+            const length = Math.sqrt(length2)
 
-        // Activate alpha
-        opacity = sigmoid(opacity)
-        opacities.push(opacity)
+            rotation = rotation.map(v => v / length)  
 
-        // (Webgl-specific) Equivalent to computeColorFromSH() with degree 0:
-        // Use the first spherical harmonic to pre-compute the color.
-        // This allow to avoid sending harmonics to the web worker or GPU,
-        // but removes view-dependent lighting effects like reflections.
-        // If we were to use a degree > 0, we would need to recompute the color 
-        // each time the camera moves, and send many more harmonics to the worker:
-        // Degree 1: 4 harmonics needed (12 floats) per gaussian
-        // Degree 2: 9 harmonics needed (27 floats) per gaussian
-        // Degree 3: 16 harmonics needed (48 floats) per gaussian
-        const SH_C0 = 0.28209479177387814
-        const color = [
-            0.5 + SH_C0 * harmonic[0],
-            0.5 + SH_C0 * harmonic[1],
-            0.5 + SH_C0 * harmonic[2]
-        ]
-        colors.push(...color)
-        // harmonics.push(...harmonic)
+            // Exponentiate scale
+            scale = scale.map(v => Math.exp(v))
 
-        // (Webgl-specific) Pre-compute the 3D covariance matrix from
-        // the rotation and scale in order to avoid recomputing it at each frame.
-        // This also allow to avoid sending rotations and scales to the web worker or GPU.
-        const cov3D = computeCov3D(scale, 1, rotation)
-        cov3Ds.push(...cov3D)
-        // rotations.push(...rotation)
-        // scales.push(...scale)
+            // Activate alpha
+            opacity = sigmoid(opacity)
+            opacities.push(opacity)
 
-        positions.push(...position)
+            // (Webgl-specific) Equivalent to computeColorFromSH() with degree 0:
+            // Use the first spherical harmonic to pre-compute the color.
+            // This allow to avoid sending harmonics to the web worker or GPU,
+            // but removes view-dependent lighting effects like reflections.
+            // If we were to use a degree > 0, we would need to recompute the color 
+            // each time the camera moves, and send many more harmonics to the worker:
+            // Degree 1: 4 harmonics needed (12 floats) per gaussian
+            // Degree 2: 9 harmonics needed (27 floats) per gaussian
+            // Degree 3: 16 harmonics needed (48 floats) per gaussian
+            const SH_C0 = 0.28209479177387814
+            const color = [
+                0.5 + SH_C0 * harmonic[0],
+                0.5 + SH_C0 * harmonic[1],
+                0.5 + SH_C0 * harmonic[2]
+            ]
+            colors.push(...color)
+            // harmonics.push(...harmonic)
+
+            // (Webgl-specific) Pre-compute the 3D covariance matrix from
+            // the rotation and scale in order to avoid recomputing it at each frame.
+            // This also allow to avoid sending rotations and scales to the web worker or GPU.
+            const cov3D = computeCov3D(scale, 1, rotation)
+            cov3Ds.push(...cov3D)
+            // rotations.push(...rotation)
+            // scales.push(...scale)
+
+            positions.push(...position)
+        }
     }
 
     console.log(`Loaded ${gaussianCount} gaussians in ${((performance.now() - start)/1000).toFixed(3)}s`)
