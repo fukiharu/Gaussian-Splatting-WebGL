@@ -41,10 +41,18 @@ const config = {
     'sagajo_canon': {
         url: "https://qfdsn0phmslzra9l.public.blob.vercel-storage.com/sagajo_canon-n3oIFlyOxezwxEiwKJRilsU6Eovhek.ply",
         // url: "models/sagajo_canon/point_cloud/iteration_30000/point_cloud.ply",
+        splattingArea: {
+            min: [-12.5, -1, -50], 
+            max: [100, 1, 6.25],
+        },
     },
     'pizza': {
         url: "https://qfdsn0phmslzra9l.public.blob.vercel-storage.com/pizza-2LDMlieZt6hqtZMIwiWxnlxd9MacMH.ply",
         // url: "models/pizza/point_cloud/iteration_30000/pizza.ply",
+        splattingArea: {
+            min: [-1000, -3, -15], 
+            max: [47, 3, 15],
+        },
     },
     'kit_lobby': {
         // url: "https://qfdsn0phmslzra9l.public.blob.vercel-storage.com/kit_lobby-VQ8g7rpSVmwWkEikNbbj91XQoat7OM.ply",
@@ -61,8 +69,8 @@ const defaultCameraParameters = {
         boundaries: [
             {
                 type: "box",
-                max: [5., 3, 5],
-                min: [-3, -3, -3],
+                max: [5, 5, 5],
+                min: [-5, -5, -3],
             },
         ],
         cameraMin: [-100, -100, -100],
@@ -71,34 +79,34 @@ const defaultCameraParameters = {
         defaultCameraMode: 'freefly',
         size: '180kb'
     },
-    'sagajo_outside': {
-        origin: [1.5227, -0.30686, -0.6966],
-        originX: [1.2345, -0.318449, 0.0922],
-        boundaries: [
-            {
-                type: "box",
-                max: [3, 3, 1],
-                min: [-1, -9, -2],
-            },
-        ],
-        cameraMin: [-100, -100, -100],
-        cameraMax: [100, 100, -100],
-        psi: -Math.PI * 20 / 36,
-        defaultCameraMode: 'freefly',
-        size: '378mb'
-    },
+    // 'sagajo_outside': {
+    //     origin: [1.5227, -0.30686, -0.6966],
+    //     originX: [1.2345, -0.318449, 0.0922],
+    //     boundaries: [
+    //         {
+    //             type: "box",
+    //             max: [3, 3, 1],
+    //             min: [-1, -9, -2],
+    //         },
+    //     ],
+    //     cameraMin: [-100, -100, -100],
+    //     cameraMax: [100, 100, -100],
+    //     psi: -Math.PI * 20 / 36,
+    //     defaultCameraMode: 'freefly',
+    //     size: '378mb'
+    // },
     'sagajo_canon': {
         camera: [0, 0, 0],
-        origin: [-2.035, -0.5125, -2.3918],
-        originX: [1.9, 0.565, 2.159],
+        origin: [1.35, 0.59, -0.6055],
+        originX: [-0.5266, -2.20976, 23.80278],
         boundaries: [
             {
                 type: "box",
-                max: [5., 3, 5],
-                min: [-3, -3, -3],
+                min: [-2, -2, -100],
+                max: [5, 2, 0],
             },
         ],
-        psi: Math.PI/2,
+        psi: Math.PI * -29 / 36,
         defaultCameraMode: 'freefly',
         size: '580mb'
     },
@@ -204,11 +212,13 @@ async function loadScene({scene, file}) {
     else
         throw new Error('No scene or file specified')
 
+    const coordinateSystem = new CoordinateSystem(defaultCameraParameters[scene])
+
     // Download .ply file and monitor the progress
     const content = await downloadPly(reader, contentLength)
 
     // Load and pre-process gaussian data from .ply file
-    const data = await loadPly(content.buffer)
+    const data = await loadPly(content.buffer, coordinateSystem, config[scene]["splattingArea"])
 
     // Send gaussian data to the worker
     worker.postMessage({ gaussians: {
