@@ -25,11 +25,11 @@ function initGUI() {
 
     // gui.add(settings, 'renderResolution', 0.1, 1, 0.01).name('Preview Resolution')
 
-    // maxGaussianController = gui.add(settings, 'maxGaussians', 1, settings.maxGaussians, 1).name('Max Gaussians')
-    //    .onChange(() => {
-    //         cam.needsWorkerUpdate = true
-    //         cam.updateWorker()
-    //     })
+    maxGaussianController = gui.add(settings, 'maxGaussians', 1, settings.maxGaussians, 1).name('Max Gaussians')
+       .onChange(() => {
+            cam.needsWorkerUpdate = true
+            cam.updateWorker()
+        })
 
     // gui.add(settings, 'scalingModifier', 0.01, 1, 0.01).name('Scaling Modifier')
     //     .onChange(() => requestRender())

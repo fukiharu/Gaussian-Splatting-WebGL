@@ -14,7 +14,7 @@ let gizmoRenderer = new GizmoRenderer()
 let positionBuffer, positionData, opacityData
 
 const settings = {
-    scene: 'sagajo_outside',
+    scene: 'kit_lobby',
     renderResolution: 0.2,
     maxGaussians: 1e6,
     scalingModifier: 1,
@@ -47,8 +47,9 @@ const config = {
         // url: "models/pizza/point_cloud/iteration_30000/pizza.ply",
     },
     'kit_lobby': {
-        url: "https://qfdsn0phmslzra9l.public.blob.vercel-storage.com/kit_lobby-VQ8g7rpSVmwWkEikNbbj91XQoat7OM.ply",
-        // url: "models/kit_lobby/point_cloud/iteration_140000/kit_lobby.ply",
+        // url: "https://qfdsn0phmslzra9l.public.blob.vercel-storage.com/kit_lobby-VQ8g7rpSVmwWkEikNbbj91XQoat7OM.ply",
+        // url: "models/kit_lobby/kit_lobby_clean.ply",
+        url: "https://qfdsn0phmslzra9l.public.blob.vercel-storage.com/kit_lobby_clean-8ViKt4X36vs7oCobGnugukP9OKeeh9.ply",
     }
 }
 
@@ -101,23 +102,25 @@ const defaultCameraParameters = {
         defaultCameraMode: 'freefly',
         size: '580mb'
     },
-    // 'kit_lobby': {
-    //     camera: [0, 0, 0],
-    //     origin: [-0.34, -0.48, -1.8853],
-    //     originX: [-1.2407, -0.295, 3.021],
-    //     boundaries: [
-    //         {
-    //             type: "box",
-    //             max: [6, 3.2, 3.5],
-    //             min: [0.35, -4, -3.5],
-    //         },
-    //     ],
-    //     cameraMin: [-100, -100, -100],
-    //     cameraMax: [100, 100, -100],
-    //     psi: - Math.PI* 16/36,
-    //     defaultCameraMode: 'freefly',
-    //     size: '417mb'
-    // },
+    'kit_lobby': {
+        camera: [0, 0, 0],
+        origin: [5.65, 0.329, 2.88],
+        originX: [5.64, 0.28, 3.01],
+        boundaries: [
+            {
+                type: "box",
+                // min: [-0.1, -1.5, -1],
+                // max: [2, 1.5, 1],
+                min: [-100, -100, -100],
+                max: [100, 100, 100],
+            },
+        ],
+        cameraMin: [-100, -100, -100],
+        cameraMax: [100, 100, 100],
+        psi: Math.PI* 38.5/36,
+        defaultCameraMode: 'freefly',
+        size: '417mb'
+    },
 }
 
 async function main() {
@@ -218,9 +221,9 @@ async function loadScene({scene, file}) {
     cam.update()
 
     // Update GUI
-    // settings.maxGaussians = Math.min(settings.maxGaussians, gaussianCount)
-    // maxGaussianController.max(gaussianCount)
-    // maxGaussianController.updateDisplay()
+    settings.maxGaussians = Math.min(settings.maxGaussians, gaussianCount)
+    maxGaussianController.max(gaussianCount)
+    maxGaussianController.updateDisplay()
 }
 
 function requestRender(...params) {
