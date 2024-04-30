@@ -14,7 +14,7 @@ let gizmoRenderer = new GizmoRenderer()
 let positionBuffer, positionData, opacityData
 
 const settings = {
-    scene: 'kit_lobby',
+    scene: 'tree',
     renderResolution: 0.2,
     maxGaussians: 1e6,
     scalingModifier: 1,
@@ -34,6 +34,10 @@ const settings = {
 }
 
 const config = {
+    'tree': {
+        // url: "models/tree/mos_tree.cleaned.ply",
+        url: "https://qfdsn0phmslzra9l.public.blob.vercel-storage.com/mos_tree.cleaned-asFI0xDOd9JFfZLu2k0qolku1BLKAk.ply",
+    },
     'sagajo_outside': {
         url: "https://qfdsn0phmslzra9l.public.blob.vercel-storage.com/sagajo_outside-IhKzzlb0kYuYLNWSyl3RgIA68NeKag.ply",
         // url: "models/sagajo_outside/point_cloud/iteration_30000/point_cloud.ply",
@@ -128,6 +132,23 @@ const defaultCameraParameters = {
         psi: Math.PI* 38.5/36,
         defaultCameraMode: 'freefly',
         size: '417mb'
+    },
+    'tree': {
+        camera: [0, 0, 0],
+        origin: [-1.572, -0.531, -1.729],
+        originX: [-0.812, -0.181, -0.781],
+        boundaries: [
+            {
+                type: "box",
+                min: [-3, -3, -3],
+                max: [3, 3, 0.8],
+            },
+        ],
+        cameraMin: [-100, -100, -100],
+        cameraMax: [100, 100, 100],
+        psi: Math.PI* 12/36,
+        defaultCameraMode: 'freefly',
+        size: '309mb'
     },
 }
 
